@@ -118,6 +118,7 @@ for i = 1:maxClusters
     %
     %         loopPhaseSpectral = angle(eigenVectors(:,2));
     
+    %% displays the loops
     figure(5);
     clf;
     hold on;
@@ -178,6 +179,8 @@ for i = 1:maxClusters
     else
         finalLoopPositions = filterData(finalLoopPositions', 0.5, 'gaussian', 1, 2)';
     end
+
+    % calculates anbd corrects errors
     
     averageLoops(i,:,:) = finalLoopPositions;
     averageErrors(i) = nansum(loopError .* loopCounts / sum(loopCounts));

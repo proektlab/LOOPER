@@ -177,6 +177,7 @@ for clusterIndex = 1:length(clusterCounts)
     %     end
     %     weights = weights ./ sum(weights);
     
+    %%makes some
     reducedMatrixTemp = zeros(max(clusterIDs), size(asymmetricProbabilities,2));
     for i = 1:size(reducedMatrixTemp,1)
         reducedMatrixTemp(i,:) = sum(asymmetricProbabilities(clusterIDs == i, :), 1) ./ sum(clusterIDs == i);

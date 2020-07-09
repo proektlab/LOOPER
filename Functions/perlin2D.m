@@ -1,3 +1,4 @@
+%% creates and processes image
 function s = perlin2D (m)
   s = zeros([m,m]);     % Prepare output image (size: m x m)
   w = m;

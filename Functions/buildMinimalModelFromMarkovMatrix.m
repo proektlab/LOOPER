@@ -131,6 +131,8 @@ graphTree = 1 ./ graphTree;
 %     h.Color(4) = 0.2;
 % end
 
+%% finds and displays all the loops
+
 allLoops  = {};
 loopCorrelationMatrix = zeros(size(transitionToMatrix,1));
 loopValues = [];
@@ -237,6 +239,8 @@ for i = 1:size(transitionToMatrix,1)
     
 end
 
+
+%calculates the bandwidths and weights for each loop
 
 loopBandwidth = [];
 loopWeight = [];
@@ -360,6 +364,8 @@ allLoopAssignments = {};
 allStateMaps = {};
 
 
+
+%claculates accuracy for each loop/cluster
 if ~selectingLoops
     waitHandle = parfor_progressbar(length(putativeLoopCounts), 'Calculating model accuracy');
 end
@@ -436,7 +442,7 @@ if ~selectingLoops
     
 end
 
-
+    %% UI stuff, displays the loops from the markov matrix 
 %callback function for the pushbutton  (save it in its own *.m file if needed)           
 function buttonSelected(varargin)
     UIData = varargin{3};  % Get the structure.
