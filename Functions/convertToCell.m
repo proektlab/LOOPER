@@ -1,3 +1,5 @@
+%%coverts data to a cell 
+
 function [cellData] = convertToCell(data)
     if size(data,3) > 1
         cellData = cell(size(data,3),1);
