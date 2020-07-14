@@ -315,7 +315,12 @@ maxClusters = clusterCounts(minIndex);
 clusterIndex = find(clusterCounts == maxClusters);
 clusterIDs = cluster(clustering,'maxclust',maxClusters);
 
+uniqueClusterIDs = unique(clusterIDs);
+finalClusterCount = length(uniqueClusterIDs);
 
+for i = 1:length(uniqueClusterIDs)
+    clusterIDs(clusterIDs == uniqueClusterIDs(i)) = i;
+end
 
 validClusters = [];
 countClusters = [];
@@ -337,12 +342,23 @@ for i = 1:max(clusterIDs)
     countClusters(i) = length(thisIndices);
     validClusters(i) = countClusters(i) > size(diffusedProbabilities,1) / size(reducedMatrices{clusterIndex},1) / 10;
     
+    
+    figure(i);
+    clf;
+    hold on;
+    if DEBUG
+        thisTrace = finalDynamicsStream * pcaBasis;
+        plot3(thisTrace(:,1), thisTrace(:,2), thisTrace(:,3));
+        scatter3(thisTrace(thisIndices,1), thisTrace(thisIndices,2), thisTrace(thisIndices,3));
+        scatter3(clusterMeansPCA(i,1), clusterMeansPCA(i,2), clusterMeansPCA(i,3), 300, 'rx', 'LineWidth', 10);
+    end
+    
 %     meanValues = exp(1i*allPhases(thisIndices));
 %     clusterPhaseMeans(i) = angle(mean(meanValues));
 %     clusterPhaseSTDs(i) = std(allPhases(thisIndices));
 end
 
-finalReducedMatrix = reducedMatrices{clusterIndex};
+finalReducedMatrix = reducedMatrices{clusterIndex}(uniqueClusterIDs,uniqueClusterIDs);
 
 % if shouldUseTerminalState        
 %     clusterMeans(end+1,:) = nan(size(clusterMeans(1,:)));

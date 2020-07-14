@@ -497,7 +497,10 @@ end
 %             steadyState = sum(asymmetricProbabilities^100,1) / size(asymmetricProbabilities,1);
 %         end
         
-        stateDensities = sqrt(steadyState * steadyState');
+        stateDensities = steadyState * steadyState';
+        stateDensities(stateDensities < 0) = 0; % Rounding errors can give <0 and cause complex numbers
+        stateDensities = sqrt(stateDensities);
+        
         asymmetricProbabilities = asymmetricProbabilities ./ stateDensities;
 
         asymmetricProbabilities = asymmetricProbabilities ./ sum(asymmetricProbabilities,2);

@@ -56,6 +56,9 @@ for i = 1:maxClusters
     thisLoopWeights = loopWeight(clusterLoops);
     thisLoopWeights = thisLoopWeights / sum(thisLoopWeights);
     ANGLE_SIGMA = 2*pi/(sum(loopLengths(clusterLoops).*thisLoopWeights')*2);
+    if isnan(ANGLE_SIGMA)
+        ANGLE_SIGMA = 1;
+    end
     
     if hasTerminalState
         terminalStatePhase = nanmean(clusterPhases(:,terminalStateID));
@@ -85,7 +88,11 @@ for i = 1:maxClusters
             phaseWeights = nansum(phaseWeights) .* sqrt(countClusters);
         end
         
-        phaseWeights = phaseWeights / nansum(phaseWeights);
+        if nansum(phaseWeights) == 0
+            phaseWeights(clusterLoops) = 1;
+        else
+            phaseWeights = phaseWeights / nansum(phaseWeights);
+        end
 
         if shouldUseTerminalState
             loopPositions(j,:) = phaseWeights(1:end-1) * clusterMeans;
