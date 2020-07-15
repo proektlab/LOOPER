@@ -12,30 +12,6 @@ if ~exist('selectingLoops', 'var') || isempty(selectingLoops)
     selectingLoops = 1;
 end
 
-%%
-
-% figure(7);
-% clf;
-% hold on;
-% h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
-% h.Color(4) = 0.2;
-%
-% colors = jet(size(modelMatrix,1));
-%
-% for j = 1:size(modelMatrix,1)
-%     thisID = j;
-%
-%     points(1,:) = clusterMeansPCA(thisID,:);
-%     scatter3(points(:,1), points(:,2), points(:,3), 'o', 'LineWidth', 2,'MarkerEdgeColor',colors(j,:));
-% end
-
-%%
-%
-% cursorMode = datacursormode(gcf);
-% datatips = cursorMode.getCursorInfo();
-% find(ismember(clusterMeansPCA, datatips(1).Position, 'rows'))
-
-%%
 
 %Add terminal state
 
@@ -49,7 +25,7 @@ end
 transitionToMatrix = zeros(size(modelMatrix));
 transitionFromMatrix = zeros(size(modelMatrix));
     
-transformedTrialEnds = trialSwitchTimes;% - 2*(1:length(trialSwitchTimes));
+transformedTrialEnds = trialSwitchTimes;
 toTerminalTimes = [transformedTrialEnds, length(clusterIDs)];
 fromTerminalTimes = [1, transformedTrialEnds + 1];
 fromTerminalTimes(end) = [];
@@ -104,12 +80,10 @@ for clusterID = 1:size(transitionFromMatrix,1)
     for i = unique(toClusters)'
         transitionToMatrix(clusterID, i) = sum(toClusters == i);
     end
-    %     transitionToMatrix(clusterID,:) = transitionToMatrix(clusterID,:) / sum(transitionToMatrix(clusterID,:));
     
     for i = unique(fromClusters)'
         transitionFromMatrix(clusterID, i) = sum(fromClusters == i);
     end
-    %     transitionFromMatrix(clusterID,:) = transitionFromMatrix(clusterID,:) / sum(transitionFromMatrix(clusterID,:));
     
 end
 
@@ -123,13 +97,6 @@ graphTree(graphTree < MIN_VALUE) = MIN_VALUE;
 graphTree(find(eye(size(graphTree)))) = MIN_VALUE;
 graphTree = 1 ./ graphTree;
 
-% if DISPLAY
-%     figure(5);
-%     clf;
-%     hold on;
-%     h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
-%     h.Color(4) = 0.2;
-% end
 
 %% finds and displays all the loops
 
@@ -214,7 +181,7 @@ for i = 1:size(transitionToMatrix,1)
             pause(1);
         end
         
-        %         if length(bestPath) < 3 || (totalLength < bestLength && length(path) > 2)
+
         if totalLength < bestLength
             bestLength = totalLength;
             bestPath = path;
@@ -225,18 +192,7 @@ for i = 1:size(transitionToMatrix,1)
     loopCorrelationMatrix(loopStart,bestPath) = 1;
     loopValues(loopStart) = bestLength;
     
-    %     if DISPLAY && i == uniqueLoops(10)%i >= 26 && i <= 26
-    %         colors = lines(size(transitionToMatrix,1));
-    %         drawPath = [bestPath bestPath(1)];
-    %         for j = 1:length(drawPath)-1
-    %             thisID = drawPath(j);
-    %
-    %             points(1,:) = clusterMeansPCA(thisID,:);
-    %             points(2,:) = clusterMeansPCA(drawPath(j+1),:);
-    %             plot3(points(:,1), points(:,2), points(:,3), '-o', 'LineWidth', 2,'Color',colors(loopStart,:));
-    %         end
-    %     end
-    
+
 end
 
 
@@ -264,26 +220,6 @@ for i = 1:size(transitionToMatrix,1)
 end
 loopBandwidth(loopBandwidth == 0) = nan;
 
-%%
-
-% [steadyState, ~] = eigs(asymmetricProbabilities', 1);
-% fluxMatrix = diag(steadyState) * asymmetricProbabilities;
-% symmetricMatrix = (fluxMatrix+fluxMatrix.')/2;
-% antisymmetricMatrix = (fluxMatrix-fluxMatrix.')/2;
-% symmetricMatrix = symmetricMatrix ./ steadyState;
-% antisymmetricMatrix = antisymmetricMatrix ./ steadyState;
-% 
-% stateTransitions = [];
-% for i = 1:size(modelMatrix,1)
-%     thisStates = find(clusterIDs == i);
-%     
-%     stateTransitions(i,:) = sum(symmetricMatrix(thisStates,:));
-%     stateTransitions(i,:) = stateTransitions(i,:) ./ norm(stateTransitions(i,:));
-% end
-% 
-% stateSimilarities = stateTransitions * stateTransitions';
-
-%%
 
 loopOverlap = loopCorrelationMatrix * loopCorrelationMatrix';
 loopLengths = sum(loopCorrelationMatrix,2);
@@ -357,7 +293,6 @@ loopClustering = linkage(clusterSimilarities, 'complete');
 TOTAL_LOOPS = totalClusters;
 
 allLikelihoods = [];
-% averageVariances = [];
 allModels = {};
 allEmissions = {};
 allLoopAssignments = {};
@@ -365,7 +300,7 @@ allStateMaps = {};
 
 
 
-%claculates accuracy for each loop/cluster
+% calculates accuracy for each loop/cluster
 if ~selectingLoops
     waitHandle = parfor_progressbar(length(putativeLoopCounts), 'Calculating model accuracy');
 end
@@ -390,8 +325,6 @@ for maxClusterIndex = 1:length(putativeLoopCounts)
                      test=1;
     else
         buildMinimalModelFromLoops
-        
-        %%
         
         validationModel = minimalModel;
         validationEmission = statePositions;
@@ -423,7 +356,6 @@ if ~selectingLoops
     allLikelihoods
     
     [~, bestLoopID] = min(allLikelihoods);
-    % bestLoopID = 3;
     
     bestLoopCount = putativeLoopCounts(bestLoopID);
     
@@ -433,12 +365,6 @@ if ~selectingLoops
     bestStateMap = allStateMaps{bestLoopID};
     
     bestStateCount = size(bestModel,1);
-    
-    % totalParameters = putativeLoopCounts / 2 * log(numDataPoints / (2*pi));
-    %
-    %
-    % BICs = totalLikelihoods' + totalParameters;
-    
     
 end
 
@@ -469,7 +395,6 @@ function buttonSelected(varargin)
             buttonID = 0;
         end
 
-    %     delete(UIData.buttons(buttonID))
     end
     
     drawLoops(UIData.app, true, buttonID, UIData.seed, UIData.maxClusters, UIData.loopClusterIDs, UIData.finalDynamicsStream, UIData.pcaBasis, UIData.allLoops, UIData.uniqueLoops, UIData.clusterMeansPCA, UIData.loopBandwidth, UIData.mergedLoopIDs, UIData.TOTAL_LOOPS, UIData.clusterIDs, UIData.loopCorrelationMatrix, UIData.stateSimilarities, UIData.loopWeight, UIData.loopLengths, UIData.clusterMeans, UIData.countClusters);

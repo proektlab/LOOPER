@@ -1,6 +1,6 @@
 %% finds the axes to display (the ones with the most bearing) 
 function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDistances, bestNeighborCounts, distanceRatios] = findBestAxes(dynamicsStream, calcIndex, meanDistanceMatrix, verbose)
-    %meanDistanceMatrix = pdist2(dynamicsStream, dynamicsStream);
+    
 
     bestSigmaValues = [];
     bestNeighborCounts = [];
@@ -9,7 +9,7 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
     bestDiffSigmaValues = [];
     localDistances = [];
     
-%     dynamicsStream = [dynamicsStream(1:end-4,:), dynamicsStream(2:end-3,:), dynamicsStream(3:end-2,:), dynamicsStream(4:end-1,:), dynamicsStream(5:end-0,:) ];
+
 
     %% Near trajectories
 
@@ -21,7 +21,7 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
     if ~exist('verbose', 'var') || isempty(verbose)
         verbose = 0;
     end
-%     verbose=1
+
     
     test = meanDistanceMatrix(1:end,1:end);
     totalValues = test(calcIndex,:);
@@ -74,61 +74,32 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
         globalMean = mean(dynamicsStream);
         globalSTD = std(dynamicsStream - globalMean);
         currentMean = mean(dynamicsStream(currentPeaks,:));
-%         if calcIndex < size(dynamicsStream,1)
-%             derivative = dynamicsStream(calcIndex,:) - dynamicsStream(calcIndex + 1,:);
-%             currentSTD = sum([derivative; BEST_TRAJECTORY_COUNT*globalSTD; currentPCAWeight*std(dynamicsStream(currentPeaks,:) - currentMean)]) / (1 + currentPCAWeight + BEST_TRAJECTORY_COUNT);
-%         else
-            currentSTD = sum([BEST_TRAJECTORY_COUNT*globalSTD; currentPCAWeight*std(dynamicsStream(currentPeaks,:) - currentMean)]) / (currentPCAWeight + BEST_TRAJECTORY_COUNT);
-%             currentSTD = std(dynamicsStream(currentPeaks,:) - currentMean);
-%         end
-        %         currentSTD = std(dynamicsStream(currentPeaks,:));
+        currentSTD = sum([BEST_TRAJECTORY_COUNT*globalSTD; currentPCAWeight*std(dynamicsStream(currentPeaks,:) - currentMean)]) / (currentPCAWeight + BEST_TRAJECTORY_COUNT);
+
         currentSTD = currentSTD / sqrt(sum(currentSTD.^2));
-%         currentSTD = ones(size(currentSTD));
         currentStream = dynamicsStream ./ currentSTD;
         currentStream(isinf(currentStream)) = 0.0001;
 
-%         thisValues = pdist2(currentStream(calcIndex,:), currentStream);
         thisValues = pdist2(currentStream(currentPeaks,:), currentStream);
-%         thisValues = thisValues(1,:);
-%         nextValues = pdist2(currentStream(calcIndex+1,:), currentStream(2:end,:));
-        
-%         sortedValues = sort(thisValues);
-%         thisProbabilities = cumsum(thisValues) / sum(thisValues);
 
         smoothSigma = 1;
         x = -ceil(3*smoothSigma):ceil(3*smoothSigma);
         kernel = -x.*exp(-x.^2/(2*smoothSigma^2))/(smoothSigma^3*sqrt(2*pi));
 
         currentDiff = filterData(currentStream, 0, kernel, 1, 0);
-%         thisDiffDistances = pdist2(currentDiff(calcIndex,:), currentDiff, 'cosine');
-        thisDiffDistances = pdist2(currentDiff(currentPeaks,:), currentDiff, 'cosine');
-%         thisDiffDistances = thisDiffDistances(1,:);
-%         sortedDiffDistances = sort(thisDiffDistances);
-%         
-%         diffProbabilities = cumsum(sortedDiffDistances) / sum(sortedDiffDistances);
-        
-        
-%         diffCurvature = filterData(filterData(sortedDiffDistances, 0, kernel, 1, 0), 50);
-%         [~, bestDiffSigmaIndex] = min(diffCurvature);
-%         bestDiffSigma = sortedDiffDistances(ceil(bestDiffSigmaIndex/2));
-%         guassianDiff = exp(-thisDiffDistances.^2/(2*bestDiffSigma^2));
-%         guassianDiff(guassianDiff < 0.1) = 0.1;
 
-%         clf
-%         plot(sort(thisValues)/max(thisValues))
-%         hold on
-%         plot(sort(thisDiffDistances)/max(thisDiffDistances))
+        thisDiffDistances = pdist2(currentDiff(currentPeaks,:), currentDiff, 'cosine');
+
 
         totalValues = 1 - (1 - thisValues ./ max(thisValues,[],2)) .* (1 - thisDiffDistances ./ max(thisDiffDistances,[],2));
     
         allValues = totalValues(1,:);
         totalValues = totalValues(1,:);
         
-%         totalValues = totalValues(1,:)
         
         allPeaks = [];
         allPeakIDs = [];
-        for j = 1%:size(thisValues,1)
+        for j = 1
             [peaks, peakIDs] = findpeaks(-totalValues(j,:));            
             peakIDs = peakIDs + size(totalValues,2)*(j-1);
             
@@ -142,16 +113,6 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
 
         sortedPeakTimes = allPeakIDs(sortIDs);
 
-%         j = 1;
-%         while j < length(sortedPeakTimes)
-%             tempPeakTimes = sortedPeakTimes(j+1:end);
-%             repeatIndices = find(tempPeakTimes > sortedPeakTimes(j) - MIN_RETURN_TIME & tempPeakTimes < sortedPeakTimes(j) + MIN_RETURN_TIME);
-% 
-%             sortedPeakTimes(repeatIndices + j) = [];
-% 
-% 
-%             j = j + 1;
-%         end
 
         if currentPeakCount >= length(sortedPeakTimes)
             break;
@@ -161,7 +122,7 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
 
         totalErrors = [];
         sigmas = [];
-        for j = 1:length(sortedPeakTimes)%min(length(sortedPeakTimes), currentPeakCount*2)            
+        for j = 1:length(sortedPeakTimes)% min(length(sortedPeakTimes), currentPeakCount*2)            
             sigma = sortedDistances(j);
             
             gaussianDistances = exp(-allValues.^2/(2*sigma^2));
@@ -186,7 +147,6 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
         
         sigma = sigmas(bestIndex);
         
-%         bestTraceValues = -findpeaks(-allValues);
         
         gaussianDistances = exp(-allValues.^2/(2*sigma^2));
                 
@@ -205,35 +165,8 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
             test = 1;
         end
         
-%         slope = filterData(filterData(sortedDistances, 0, kernel, 1, 0), 50);
-%         [~, bestDiffSigmaIndex] = min(slope);
-%         sigma = sortedDiffDistances(ceil(bestDiffSigmaIndex/2));
-        
-%         if i == 1
-%             sigma = thisValues(sortedPeakTimes(2));
-%         else
-%             sigma = thisValues(sortedPeakTimes(ceil(currentPeakCount/2+1)));
-%         end
-%         gaussianDistances = exp(-thisValues.^2/(2*sigma^2));
-
-
         diffDistances = diff(sortedDistances);
 
-%         if i == 1
-%             calcTimes = sortedPeakTimes(1);
-%             calcTimes = [calcTimes calcTimes + 1];
-%             worstDistance = pdist2(currentStream(calcTimes,:),currentStream(calcTimes,:));
-% %         elseif sum(inCluster) == 1
-% %             calcTimes = sortedPeakTimes(inCluster);
-% %             calcTimes = [calcTimes calcTimes + 1];
-% %             worstDistance = pdist2(currentStream(calcTimes,:),currentStream(calcTimes,:));
-%         else
-%             calcTimes = inCluster;
-%             worstDistance = pdist2(currentStream(calcTimes,:),currentStream(calcTimes,:));
-%         end
-%         worstDistance(logical(eye(size(worstDistance)))) = max(max(worstDistance));
-%         minDistance = min(min(worstDistance));
-%         worstDistance = max(min(worstDistance));
 
         totalError = totalError;
 
@@ -245,13 +178,12 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
         peakIndices{end+1} = allPeakIDs;
         peakValues{end+1} = totalValues(allPeakIDs);
         maxDistances(end+1) = totalError;
-%         worstDistances(end+1) = worstDistance;
-%         minDistances(end+1) = minDistance;
+
         bestSigmas(end+1) = sigma;
         bestProjections(:,end+1) = currentSTD;
         bestDistances(:,end+1) = exp(-totalValues(1,:).^2/(2*sigma^2));
         neighborhoodCounts(end+1) = currentPeakCount;
-%         diffSigmas(end+1) = bestDiffSigma;
+
 
         if verbose
             figure(3+i)
@@ -267,9 +199,9 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
         end
     end
     
-    finalScore = maxDistances;% .* minDistances ./ worstDistances;% .* -log(minDistances ./ worstDistances);
+    finalScore = maxDistances; 
 
-%     distances = filterData(finalScore(MIN_NEIGHBOR_COUNT+1:end), 1, 'gaussian', false, 0);
+
     distances = finalScore(MIN_NEIGHBOR_COUNT+1:end);
     if 0%length(distances) > 2
         [~,peakIndices] = findpeaks(distances);
@@ -287,8 +219,6 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
     
     if verbose
         figure(3+bestIndex)
-%         clf;
-%         plot(sort(gaussianDistances, 'descend'));
         title(['Best k = ' num2str(neighborhoodCounts(bestIndex))]);
     end
 
@@ -297,9 +227,7 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
         clf;
         hold on;
         plot(finalScore(MIN_NEIGHBOR_COUNT+1:end) / max(finalScore(MIN_NEIGHBOR_COUNT+1:end)));
-%         plot(distances(MIN_NEIGHBOR_COUNT+1:end) / max(distances(MIN_NEIGHBOR_COUNT+1:end)));
-%         plot(bestSigmas(MIN_NEIGHBOR_COUNT+1:end) / max(bestSigmas(MIN_NEIGHBOR_COUNT+1:end)));
-%         plot(worstDistances(MIN_NEIGHBOR_COUNT+1:end) / max(worstDistances(MIN_NEIGHBOR_COUNT+1:end)));
+
     end
     
     distanceValues = bestDistances(:,bestIndex+MIN_NEIGHBOR_COUNT);
@@ -326,8 +254,8 @@ function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDista
     bestLocalProjections = bestProjections(:,bestIndex+MIN_NEIGHBOR_COUNT);
     bestSigmaValues = bestSigmas(bestIndex+MIN_NEIGHBOR_COUNT);
     localDistances = bestValues{bestIndex+MIN_NEIGHBOR_COUNT};
-    bestDiffSigmaValues = 0;%minDistances(bestIndex+MIN_NEIGHBOR_COUNT) / worstDistances(bestIndex+MIN_NEIGHBOR_COUNT);
+    bestDiffSigmaValues = 0;
     bestNeighborCounts = neighborhoodCounts(bestIndex+MIN_NEIGHBOR_COUNT);
-    distanceRatios = 0;%minDistances(bestIndex+MIN_NEIGHBOR_COUNT) / worstDistances(bestIndex+MIN_NEIGHBOR_COUNT);
+    distanceRatios = 0;
     
 end

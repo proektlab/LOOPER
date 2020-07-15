@@ -14,10 +14,6 @@ function [tempData, trialData, procesedTrialSwitches, dataMean, dataSTD] = prepr
                 outputIndices = size(rawData, 1) + size(rawInput,1) + (1:size(rawOutput,1));
             end
             trialIndices = [];
-%             if exist('rawTrialData') && ~isempty(rawTrialData)
-%                 tempData = [tempData, rawTrialData'];
-%                 trialIndices = size(rawData, 1) + size(rawInput,1) + size(rawOutput,1) + (1:size(rawTrialData,1));
-%             end
             
             tempData = tempData';
             
@@ -58,7 +54,6 @@ function [tempData, trialData, procesedTrialSwitches, dataMean, dataSTD] = prepr
             dataAmplitudeQuantile(dataAmplitudeQuantile == 0) = dataAmplitude(dataAmplitudeQuantile == 0);
             dataAmplitudeQuantile(dataAmplitudeQuantile == 0) = 1;
             
-%             dataAmplitudeQuantile = std(tempData, [], 2);
             
             dataMagnitude = norm(dataAmplitudeQuantile(dataIndices));
             

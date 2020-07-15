@@ -24,8 +24,8 @@ disp('Validating...');
 
 USE_PCA = 0;
 
-noInputDynamics = finalDynamicsStream;%(:,1:100);
-noInputEmissions = validationEmission;%(:,1:100);
+noInputDynamics = finalDynamicsStream;
+noInputEmissions = validationEmission;
 
 dynamicsMean = mean(noInputDynamics,1);
 dynamicsSTD = std(noInputDynamics - dynamicsMean,1);
@@ -52,15 +52,6 @@ predictTime = 1;
 
 possibleTransitions = validationModel;
 possibleTransitions = possibleTransitions^predictTime;
-% currentTransitions = possibleTransitions;
-% possibleTransitionsList = {};
-% for i = 1:maxTime
-%     possibleTransitionsList{i} = currentTransitions;
-%     possibleTransitionsList{i}(possibleTransitionsList{i} > 1) = 1;
-%     possibleTransitionsList{i}(possibleTransitionsList{i} == 0) = 100000;
-%     
-%     currentTransitions = currentTransitions * possibleTransitions;
-% end
 
 fromStates = [];
 toStates = [];
@@ -69,7 +60,6 @@ for i = 1:size(noInputDynamics,1)-predictTime
     distances = emissionDistances(:,i);
     nextDistances = emissionDistances(:,i+predictTime);
     
-%     min(1 - possibleTransitions(:))
     
     transitionScores = log(((distances .* repmat(nextDistances, [1, size(nextDistances,1)])) ./ possibleTransitions));
     transitionScores(isinf(transitionScores)) = 100000;
@@ -81,18 +71,7 @@ for i = 1:size(noInputDynamics,1)-predictTime
     
     fromStates(i) = currentState;
     toStates(i) = nextState;
-%     disp([num2str(currentState) ' -> ' num2str(nextState) ' = ' num2str(scores(i))]);
-%     position = noInputDynamics(i,:);
-%     velocity = noInputDynamics(i+1,:) - position;
-%     
-%     distances = emissionDistances(:,i);
-%     velocityDistances = emissionVelocities - permute(velocity, [3,1,2]);
-%     velocityDistances = sqrt(sum(velocityDistances.^2,3));
-%     velocityDistances = min(velocityDistances,[],1);
-%     
-%     emissionsTotals = distances + velocityDistances;
-%     
-%     velocityDistance = pdist2(velocity);
+
 end
 
 
