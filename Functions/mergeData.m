@@ -1,4 +1,3 @@
-% flattens an n-D vector into an (n-1)-D vector
 function [mergedData] = mergeData(data)
     totalLength = 0;
 

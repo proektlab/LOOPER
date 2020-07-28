@@ -1,4 +1,3 @@
-%% finds the distance between two points within the context of the local scope
 function findLocalDistance()
     thisValues = pdist2(currentStream(calcIndex,:), currentStream);
 

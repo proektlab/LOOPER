@@ -1,5 +1,3 @@
-% Converts data into useable format-- easily readable formatting
-
 function [tempData, trialData, procesedTrialSwitches, dataMean, dataSTD] = preprocessData(rawData, rawInput, inputLambda, rawOutput, outputLambda, rawTrialData, trialLambda, isTrainingData, smoothingAmount, shouldZScore, delayTime, delayCount, dataMean, dataSTD)
             tempData = rawData';
             dataIndices = 1:size(rawData, 1);

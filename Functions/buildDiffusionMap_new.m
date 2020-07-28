@@ -417,8 +417,6 @@
 %         
 %         trimmedMatrix = exponentiatedMatrix;
         
-% use terminalID's to trim the matrix 
-
         allStarts = [1 terminalIDs+1];
         allStarts(end) = [];
         
@@ -460,7 +458,6 @@
 % %             exponentiatedMatrix(badIndices(i),badIndices(i)) = 0;
 % %         end
 
-        % makes a markov prob matrix from the assymetric probabilities
         terminalIDs = allTerminalIDs - (1:length(allTerminalIDs));
         allTerminalIDs = [allTerminalIDs allTerminalIDs-1];
         
@@ -505,8 +502,6 @@
 %         badIndiciesColumn = maxProbabilities > MAX_PROBABILITY;
 %         badIndicies = unique([find(badIndiciesRow); find(badIndiciesColumn)']);
 %         badIndicies = finalNeighbors <= 5;
-
-        % gets rid of small/negligible outcomes/probabilities
         badIndicies =  find(inCounts ./ outCounts < IN_OUT_RATIO_CUTOFF);        
         badIndicies(badIndicies > size(asymmetricProbabilities,1)) = [];
         
@@ -562,7 +557,7 @@
 %         asymmetricProbabilities = asymmetricProbabilities ./ sqrt(localWeights'*localWeights);
 %         asymmetricProbabilities = asymmetricProbabilities ./ sum(asymmetricProbabilities, 2);
 
-        %plots the markov matrix 
+
         finalIndicies = 1:size(thisDynamicsStream,1);
         finalIndicies(allBadIndices) = [];
         

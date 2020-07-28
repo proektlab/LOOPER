@@ -177,7 +177,6 @@ for clusterIndex = 1:length(clusterCounts)
     %     end
     %     weights = weights ./ sum(weights);
     
-    %%makes some
     reducedMatrixTemp = zeros(max(clusterIDs), size(asymmetricProbabilities,2));
     for i = 1:size(reducedMatrixTemp,1)
         reducedMatrixTemp(i,:) = sum(asymmetricProbabilities(clusterIDs == i, :), 1) ./ sum(clusterIDs == i);
@@ -347,6 +346,7 @@ for i = 1:max(clusterIDs)
     figure(i);
     clf;
     hold on;
+    DEBUG = 0;
     if DEBUG
         thisTrace = finalDynamicsStream * pcaBasis;
         plot3(thisTrace(:,1), thisTrace(:,2), thisTrace(:,3));

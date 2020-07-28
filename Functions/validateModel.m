@@ -11,12 +11,12 @@ scoreMean = 0;
 scoreSTD = 0;
 
 if size(validationEmission, 2) ~= size(finalDynamicsStream,2)
-    disp(['Emission matrix must be STATES by CHANNELS (' num2str(size(validationModel,2)) ', ' num2str(size(finalDynamicsStream,2)) ')']);
+    disp(['Test data must have ' num2str(originalDataSize(1)) ' CHANNELS']);
     return;
 end
 
 if size(validationEmission, 1) ~= size(validationModel,2)
-    disp(['Emission matrix must be STATES by CHANNELS (' num2str(size(validationModel,2)) ', ' num2str(size(finalDynamicsStream,2)) ')']);
+    disp(['Emission matrix must be STATES by CHANNELS (' num2str(size(validationModel,2)) ', ' num2str(size(finalDynamicsStream,1)) ')']);
     return;
 end
 
@@ -52,15 +52,6 @@ predictTime = 1;
 
 possibleTransitions = validationModel;
 possibleTransitions = possibleTransitions^predictTime;
-% currentTransitions = possibleTransitions;
-% possibleTransitionsList = {};
-% for i = 1:maxTime
-%     possibleTransitionsList{i} = currentTransitions;
-%     possibleTransitionsList{i}(possibleTransitionsList{i} > 1) = 1;
-%     possibleTransitionsList{i}(possibleTransitionsList{i} == 0) = 100000;
-%     
-%     currentTransitions = currentTransitions * possibleTransitions;
-% end
 
 fromStates = [];
 toStates = [];
@@ -68,8 +59,6 @@ scores = [];
 for i = 1:size(noInputDynamics,1)-predictTime
     distances = emissionDistances(:,i);
     nextDistances = emissionDistances(:,i+predictTime);
-    
-%     min(1 - possibleTransitions(:))
     
     transitionScores = log(((distances .* repmat(nextDistances, [1, size(nextDistances,1)])) ./ possibleTransitions));
     transitionScores(isinf(transitionScores)) = 100000;
@@ -81,18 +70,6 @@ for i = 1:size(noInputDynamics,1)-predictTime
     
     fromStates(i) = currentState;
     toStates(i) = nextState;
-%     disp([num2str(currentState) ' -> ' num2str(nextState) ' = ' num2str(scores(i))]);
-%     position = noInputDynamics(i,:);
-%     velocity = noInputDynamics(i+1,:) - position;
-%     
-%     distances = emissionDistances(:,i);
-%     velocityDistances = emissionVelocities - permute(velocity, [3,1,2]);
-%     velocityDistances = sqrt(sum(velocityDistances.^2,3));
-%     velocityDistances = min(velocityDistances,[],1);
-%     
-%     emissionsTotals = distances + velocityDistances;
-%     
-%     velocityDistance = pdist2(velocity);
 end
 
 
@@ -127,3 +104,5 @@ for i = 1:5:length(toStates)
     
     plot3(lines(:,1), lines(:,2), lines(:,3), 'k', 'LineWidth', 1);
 end
+
+

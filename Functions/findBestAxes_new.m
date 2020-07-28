@@ -1,4 +1,3 @@
-%% finds the axes to display (the ones with the most bearing) 
 function [bestLocalProjections, bestSigmaValues, bestDiffSigmaValues, localDistances, bestNeighborCounts, distanceRatios] = findBestAxes(dynamicsStream, calcIndex, meanDistanceMatrix, verbose)
     %meanDistanceMatrix = pdist2(dynamicsStream, dynamicsStream);
 
