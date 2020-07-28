@@ -38,9 +38,7 @@ function findLocalDistance()
         break;
     end
 
-    %             currentDistances = sum((currentStream(currentPeaks,:) - currentMean).^2,2);
     sortedDistances = thisValues(sortedPeakTimes);
-    %                 sortedDistances = sort(thisValues);
     if i == 1
         sigma = thisValues(sortedPeakTimes(2));
     else

@@ -116,14 +116,6 @@ for i = 1:maxClusters
         thisPoints = unique([thisPoints, find(clusterIDs == allClusters(j))']);
     end
 
-    %         loopPhaseSpectral = [];
-    %         reducedMatrix = asymmetricProbabilities(thisPoints,thisPoints);
-    %         reducedMatrix = reducedMatrix ./ sum(reducedMatrix,2);
-    %
-    %         [eigenVectors, eigenValues] = eigs(reducedMatrix', 10);
-    %         eigenValues = diag(eigenValues);
-    %
-    %         loopPhaseSpectral = angle(eigenVectors(:,2));
     
     figure(5);
     clf;
@@ -167,7 +159,6 @@ for i = 1:maxClusters
 
         stateMap(thisIndices,:) = repmat([i, j], length(thisIndices), 1);
 
-%         finalLoopPositions(j,:) = thisWeights * finalDynamicsStream(thisIndices,:);
         finalLoopPositions(j,:) = mean(finalDynamicsStream(thisIndices,:), 1);
 
         loopError(j) = var(pdist2(single(finalDynamicsStream(thisIndices,:)*loopPCABasis / norm(loopPCABasis)), single(finalLoopPositions(j,:)*loopPCABasis / norm(loopPCABasis))), thisWeights);
@@ -193,7 +184,6 @@ end
 
 totalError = sum(averageErrors .* totalPoints / sum(totalPoints));
 
-% averageVariances(end + 1) = totalError;
 
 [uniqueStates, ~, stateIDs] = unique(stateMap, 'row');
 
