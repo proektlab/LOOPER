@@ -1,8 +1,4 @@
 
-% finalDynamicsStream
-% validationModel
-% validationEmission
-
 % returns scoreMean, scoreSTD
 
 maxTime = 10;
@@ -24,8 +20,8 @@ disp('Validating...');
 
 USE_PCA = 0;
 
-noInputDynamics = finalDynamicsStream;%(:,1:100);
-noInputEmissions = validationEmission;%(:,1:100);
+noInputDynamics = finalDynamicsStream;
+noInputEmissions = validationEmission;
 
 dynamicsMean = mean(noInputDynamics,1);
 dynamicsSTD = std(noInputDynamics - dynamicsMean,1);
