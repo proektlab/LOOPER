@@ -212,24 +212,26 @@ clusterMeansPCA = [];
 clusterSTDs = [];
 clusterSTDsPCA = [];
 
+maxDims = min(3, size(pcaBasis,2));
+
 for i = 1:max(clusterIDs)
     thisIndices = find(clusterIDs == i);
     
     clusterMeans(i,:) = mean(finalDynamicsStream(thisIndices,:),1);
-    clusterSTDs(i,:) = std(finalDynamicsStream(thisIndices,:), [], 1) / 3;
+    clusterSTDs(i,:) = std(finalDynamicsStream(thisIndices,:), [], 1) / maxDims;
     
-    clusterMeansPCA(i,:) = mean(finalDynamicsStream(thisIndices,:)*pcaBasis(:,1:3),1);
-    clusterSTDsPCA(i,:) = std(finalDynamicsStream(thisIndices,:)*pcaBasis(:,1:3),[],1) / 3;
+    clusterMeansPCA(i,:) = mean(finalDynamicsStream(thisIndices,:)*pcaBasis(:,1:maxDims),1);
+    clusterSTDsPCA(i,:) = std(finalDynamicsStream(thisIndices,:)*pcaBasis(:,1:maxDims),[],1) / maxDims;
     
     countClusters(i) = length(thisIndices);
     validClusters(i) = countClusters(i) > size(diffusedProbabilities,1) / size(reducedMatrices{clusterIndex},1) / 10;
     
     
-    figure(i);
-    clf;
-    hold on;
     DEBUG = 0;
     if DEBUG
+        figure(i);
+        clf;
+        hold on;
         thisTrace = finalDynamicsStream * pcaBasis;
         plot3(thisTrace(:,1), thisTrace(:,2), thisTrace(:,3));
         scatter3(thisTrace(thisIndices,1), thisTrace(thisIndices,2), thisTrace(thisIndices,3));

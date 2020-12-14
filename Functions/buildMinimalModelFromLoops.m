@@ -18,16 +18,20 @@ for i = 1:maxClusters
         hasTerminalState = 0;
     end
 
-    [~, bestStartClusterID] = max(sum(loopCorrelationMatrix(clusterLoops, clusterLoops)));
-    bestStartClusterID = clusterLoops(bestStartClusterID);
-
+    if length(clusterLoops) > 1
+        [~, bestStartClusterID] = max(sum(loopCorrelationMatrix(clusterLoops, clusterLoops)));
+        bestStartClusterID = clusterLoops(bestStartClusterID);
+    else
+        bestStartClusterID = clusterLoops;
+    end
+    
     [~, bestLoopID] = max(loopBandwidth(clusterLoops));
     bestLoopID = clusterLoops(bestLoopID);
 
     loopPhases = {};
     loops = {};
     clusterPhases = nan(length(clusterLoops), length(loopClusterIDs));
-
+    
     loopLength = length(allLoops{bestLoopID});
     path = allLoops{bestLoopID};
     [~, startPosition] = max(stateSimilarities(bestStartClusterID, path));
@@ -120,12 +124,19 @@ for i = 1:maxClusters
     figure(5);
     clf;
     hold on;
-    h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
+    if size(pcaBasis,2) > 2
+    	h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
+    else
+        h = plot(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), 'LineWidth', 0.5);
+    end
     h.Color(4) = 0.2;
     plotData = loopPositions;
     plotData = plotData + normrnd(0, 0.2, size(plotData));
-    plot3(plotData*pcaBasis(:,1), plotData*pcaBasis(:,2), plotData*pcaBasis(:,3), '-', 'LineWidth', 1);
-
+    if size(pcaBasis,2) > 2
+        plot3(plotData*pcaBasis(:,1), plotData*pcaBasis(:,2), plotData*pcaBasis(:,3), '-', 'LineWidth', 1);
+    else
+        plot(plotData*pcaBasis(:,1), plotData*pcaBasis(:,2), '-', 'LineWidth', 1);
+    end
 
     pointDistances = pdist2(finalDynamicsStream(thisPoints,:)*loopPCABasis, loopPositions*loopPCABasis);
 
@@ -139,13 +150,25 @@ for i = 1:maxClusters
         figure(4);
         clf;
         hold on
-        h = plot3(finalDynamicsStream*loopPCABasis(:,1), finalDynamicsStream*loopPCABasis(:,2), finalDynamicsStream*loopPCABasis(:,3), 'LineWidth', 0.5);
+        if size(pcaBasis,2) > 2
+            h = plot3(finalDynamicsStream*loopPCABasis(:,1), finalDynamicsStream*loopPCABasis(:,2), finalDynamicsStream*loopPCABasis(:,3), 'LineWidth', 0.5);
+        else
+            h = plot3(finalDynamicsStream*loopPCABasis(:,1), finalDynamicsStream*loopPCABasis(:,2), 'LineWidth', 0.5);
+        end
         h.Color(4) = 0.2;
         
         plotData = [loopPositions; loopPositions(1,:)];
-        plot3(plotData*loopPCABasis(:,1), plotData*loopPCABasis(:,2), plotData*loopPCABasis(:,3), 'k-', 'LineWidth', 1);
+        if size(pcaBasis,2) > 2
+            plot3(plotData*loopPCABasis(:,1), plotData*loopPCABasis(:,2), plotData*loopPCABasis(:,3), 'k-', 'LineWidth', 1);
+        else
+            plot(plotData*loopPCABasis(:,1), plotData*loopPCABasis(:,2), 'k-', 'LineWidth', 1);
+        end
         plotData = loopPositions;
-        scatter3(plotData*loopPCABasis(:,1), plotData*loopPCABasis(:,2), plotData*loopPCABasis(:,3), 72, testLoopColors);
+        if size(pcaBasis,2) > 2
+            scatter3(plotData*loopPCABasis(:,1), plotData*loopPCABasis(:,2), plotData*loopPCABasis(:,3), 72, testLoopColors);
+        else
+            scatter(plotData*loopPCABasis(:,1), plotData*loopPCABasis(:,2), 72, testLoopColors);
+        end
     end
     
     finalLoopPositions = [];
@@ -167,7 +190,11 @@ for i = 1:maxClusters
         
         if DISPLAY
             hold on;
-            plot3(finalDynamicsStream(thisIndices,:)*loopPCABasis(:,1), finalDynamicsStream(thisIndices,:)*loopPCABasis(:,2), finalDynamicsStream(thisIndices,:)*loopPCABasis(:,3), 'o', 'LineWidth', 1, 'Color', colors(j,:));
+            if size(pcaBasis,2) > 2
+                plot3(finalDynamicsStream(thisIndices,:)*loopPCABasis(:,1), finalDynamicsStream(thisIndices,:)*loopPCABasis(:,2), finalDynamicsStream(thisIndices,:)*loopPCABasis(:,3), 'o', 'LineWidth', 1, 'Color', colors(j,:));
+            else
+                 plot(finalDynamicsStream(thisIndices,:)*loopPCABasis(:,1), finalDynamicsStream(thisIndices,:)*loopPCABasis(:,2), 'o', 'LineWidth', 1, 'Color', colors(j,:));
+            end
         end
     end
     
@@ -203,14 +230,23 @@ for i = 1:length(stateIDs)-1
 end
 minimalModel = minimalModel ./ sum(minimalModel,2);
 
-figure(6);
-clf;
-hold on;
-h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
-h.Color(4) = 0.2;
-plotData = statePositions(stateIDs,:);
-plotData = plotData + normrnd(0, 0.2, size(plotData));
-plot3(plotData*pcaBasis(:,1), plotData*pcaBasis(:,2), plotData*pcaBasis(:,3), '-', 'LineWidth', 1);
-
-
+DEBUG = 0;
+if DEBUG == 1
+    figure(6);
+    clf;
+    hold on;
+    if size(pcaBasis,2) > 2
+        h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
+    else
+        h = plot(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), 'LineWidth', 0.5);
+    end
+    h.Color(4) = 0.2;
+    plotData = statePositions(stateIDs,:);
+    plotData = plotData + normrnd(0, 0.2, size(plotData));
+    if size(pcaBasis,2) > 2
+        plot3(plotData*pcaBasis(:,1), plotData*pcaBasis(:,2), plotData*pcaBasis(:,3), '-', 'LineWidth', 1);
+    else
+        plot(plotData*pcaBasis(:,1), plotData*pcaBasis(:,2), '-', 'LineWidth', 1);
+    end
+end
 

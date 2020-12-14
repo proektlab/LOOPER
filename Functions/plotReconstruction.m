@@ -1,5 +1,14 @@
 %% Reconstruction
 
+usePCAProjections = false;
+if exist('reconstructionPCABasis')
+    usePCAProjections = true;
+end
+
+if ~exist('reconstructionPlotIndices')
+    reconstructionPlotIndices = 1:size(saveData.FinalStream,1);
+end
+
 numTrial = max(saveData.TrialData);
 trialLength = size(saveData.FinalStream,1) / numTrial;
 plotTimes = 1:trialLength;
@@ -47,21 +56,31 @@ reconstructedStream = reconstructedStream';
 
 processedStream = saveData.FinalStream(:,1:rawUnits)';
 
+if usePCAProjections
+    reconstructedStream = (reconstructedStream' * reconstructionPCABasis)';
+    processedStream = (processedStream' * reconstructionPCABasis)';
+end
+
 figure(1001);
 clf;
 hold on;
 if size(processedStream,1) <= 3
     for i = 1:size(processedStream,1)
         subplot(size(processedStream,1),1,i)
+        hold on;
         
-        plot(processedStream, 'r')
-        plot(reconstructedStream, 'b')
+        plot(processedStream(i,:), 'r')
+        plot(reconstructedStream(i,:), 'b')
     end
 else
-    subplot(2,1,1);
-    imagesc(processedStream);
-    subplot(2,1,2);
-    imagesc(reconstructedStream);
+    h(1) = subplot(2,1,1);
+    imagesc(processedStream(:,reconstructionPlotIndices));
+    caxis1 = caxis;
+    h(2) = subplot(2,1,2);
+    imagesc(reconstructedStream(:,reconstructionPlotIndices));
+    caxis(caxis1);
+    
+    linkaxes(h);
 end
 
 validIDs = ~isnan(allIDs);
@@ -74,4 +93,4 @@ Rsquared = corr(testStream(:), testReconstruction(:));
 suptitle(['Reconstruction R^2 = ' num2str(Rsquared)]);
 
 
-
+clear 'reconstructionPlotIndices';

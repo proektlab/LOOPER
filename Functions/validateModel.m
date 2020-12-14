@@ -74,31 +74,51 @@ scoreSTD = std(scores);
 
 %%
 
-[pcaBasis, pcaOutputs] = pca(finalDynamicsStream, 'NumComponents', 3);
-
-figure(1);
-clf;
-hold on;
-h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
-h.Color(4) = 0.2;
+if size(finalDynamicsStream,2) > 2
+    [pcaBasis, pcaOutputs] = pca(finalDynamicsStream, 'NumComponents', 3);
+else
+    pcaBasis = eye(size(finalDynamicsStream,2));
+end
 
 colors = jet(256);
 scoreIndices = scores - min(scores);
 scoreIndices = scoreIndices / max(scoreIndices);
 scoreIndices = round(1 + scoreIndices * 255);
 
+figure(1);
+clf;
+hold on;
+if size(pcaBasis, 2) > 2
+    h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
+else
+    h = plot(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), 'LineWidth', 0.5);
+end
+h.Color(4) = 0.2;
+
 plotDynamics = finalDynamicsStream(1:end-predictTime,:);
 
-scatter3(plotDynamics*pcaBasis(:,1), plotDynamics*pcaBasis(:,2), plotDynamics*pcaBasis(:,3), 32, scores);
+if size(pcaBasis, 2) > 2
+    scatter3(plotDynamics*pcaBasis(:,1), plotDynamics*pcaBasis(:,2), plotDynamics*pcaBasis(:,3), 32, scores);
+else
+    scatter(plotDynamics*pcaBasis(:,1), plotDynamics*pcaBasis(:,2), 32, scores);
+end
 colormap(jet)
 
-scatter3(validationEmission*pcaBasis(:,1), validationEmission*pcaBasis(:,2), validationEmission*pcaBasis(:,3), 100, 'kx', 'LineWidth', 3);
-
+if size(pcaBasis, 2) > 2
+    scatter3(validationEmission*pcaBasis(:,1), validationEmission*pcaBasis(:,2), validationEmission*pcaBasis(:,3), 100, 'kx', 'LineWidth', 3);
+else
+    scatter(validationEmission*pcaBasis(:,1), validationEmission*pcaBasis(:,2), 100, 'kx', 'LineWidth', 3);
+end
 
 for i = 1:5:length(toStates)
-    lines = validationEmission([fromStates(i),toStates(i)],:)*pcaBasis(:,1:3);
+    maxDims = min(3, size(pcaBasis, 2));
+    lines = validationEmission([fromStates(i),toStates(i)],:)*pcaBasis(:,1:maxDims);
     
-    plot3(lines(:,1), lines(:,2), lines(:,3), 'k', 'LineWidth', 1);
+    if size(pcaBasis, 2) > 2
+        plot3(lines(:,1), lines(:,2), lines(:,3), 'k', 'LineWidth', 1);
+    else
+        plot(lines(:,1), lines(:,2), 'k', 'LineWidth', 1);
+    end
 end
 
 

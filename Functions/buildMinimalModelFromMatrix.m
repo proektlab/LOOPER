@@ -186,6 +186,10 @@ for i = 1:size(transitionToMatrix,1)
         end
     end
     
+    if isempty(bestPath)
+        bestPath = loopStart;
+    end
+    
     allLoops{loopStart} = bestPath;
     loopCorrelationMatrix(loopStart,bestPath) = 1;
     loopValues(loopStart) = bestLength;
@@ -304,6 +308,8 @@ allModels = {};
 allEmissions = {};
 allLoopAssignments = {};
 allStateMaps = {};
+
+putativeLoopCounts(putativeLoopCounts > max(uniqueLoops)) = [];
 
 
 if ~selectingLoops
@@ -470,14 +476,23 @@ function [UIData] = drawLoops(app, makeButtons, isSelected, seed, maxClusters, l
         
         subh = subplot(xSize, ySize, l);
         hold on;
-        h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
+        if size(pcaBasis,2) > 2
+            h = plot3(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), finalDynamicsStream*pcaBasis(:,3), 'LineWidth', 0.5);
+        else
+            h = plot(finalDynamicsStream*pcaBasis(:,1), finalDynamicsStream*pcaBasis(:,2), 'LineWidth', 0.5);
+        end
         h.Color(4) = 0.2;
         
         badIndicies = 1:size(finalDynamicsStream,1);
         badIndicies(allClusterIndicies) = [];
         plotStream = finalDynamicsStream;
         plotStream(badIndicies,:) = nan;
-        h = plot3(plotStream*pcaBasis(:,1), plotStream*pcaBasis(:,2), plotStream*pcaBasis(:,3), 'r', 'LineWidth', 1);
+        if size(pcaBasis,2) > 2
+            h = plot3(plotStream*pcaBasis(:,1), plotStream*pcaBasis(:,2), plotStream*pcaBasis(:,3), 'r', 'LineWidth', 1);
+        else
+            h = plot(plotStream*pcaBasis(:,1), plotStream*pcaBasis(:,2), 'r', 'LineWidth', 1);
+        end
+        
         
         axis off
         
@@ -507,7 +522,14 @@ function [UIData] = drawLoops(app, makeButtons, isSelected, seed, maxClusters, l
                     
                     points(1,:) = clusterMeansPCA(thisID,:) + pathNoise(j,:);
                     points(2,:) = clusterMeansPCA(drawPath(j+1),:) + pathNoise(j+1,:);
-                    plot3(points(:,1), points(:,2), points(:,3), '-o', 'LineWidth', 2,'Color',colors(round(loopBandwidth(loopID)),:));
+                    bandwidthLevel = loopBandwidth(loopID);
+                    if ~isnan(bandwidthLevel)
+                        if size(pcaBasis,2) > 2
+                            plot3(points(:,1), points(:,2), points(:,3), '-o', 'LineWidth', 2,'Color',colors(round(bandwidthLevel),:));
+                        else
+                            plot(points(:,1), points(:,2), '-o', 'LineWidth', 2,'Color',colors(round(bandwidthLevel),:));
+                        end
+                    end
                 end
                 
                 loopIndex = loopIndex + 1;
