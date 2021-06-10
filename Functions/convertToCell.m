@@ -1,14 +1,7 @@
-function [cellData] = convertToCell(data)
+function data = convertToCell(data)
     if size(data,3) > 1
-        cellData = cell(size(data,3),1);
-        for i = 1:size(data,3)
-            cellData{i} = data(:,:,i);
-        end
-    else
-        if ~iscell(data)
-            cellData{1} = data;
-        else
-            cellData = data;
-        end
+        data = num2cell(data, [1, 2]);
+    elseif ~iscell(data)
+        data = {data};
     end
 end
