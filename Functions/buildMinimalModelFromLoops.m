@@ -175,7 +175,7 @@ for i = 1:maxClusters
     loopError = [];
     loopCounts = [];
     for j = 1:BINS_PER_LOOP
-        thisIndices = thisPoints(find(pointLoopPosition == j));
+        thisIndices = thisPoints(pointLoopPosition == j);
         thisWeights = loopWeight(clusterIDs(thisIndices));
         thisWeights = thisWeights / sum(thisWeights);
         thisWeights(isnan(thisWeights)) = 0;

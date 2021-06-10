@@ -21,30 +21,20 @@ function [delayEmbeddedData, embeddedTime] = delayEmbed(data, numDelays, deltaT,
         end
     end
 
-    dataDiffs = [];
+    nChans = size(data, 1);
     if useDerivatives
-        filteredTrace = diff(data,1,2);
-        
-        dataDiffs(:,:) = [zeros(size(data,1),1), filteredTrace];
+        filteredTrace = [zeros(nChans, 1), diff(data,1,2)];
+        data = [data; filteredTrace];
+        nChans = 2*nChans;
     end
 
     %%
     embeddedTime = numDelays*deltaT + useDerivatives;
-    index = 1;
-    for i = 1 + embeddedTime:size(data, 2)
-        thisVector = [];
-
-        for j = 0:numDelays
-            thisVector = [thisVector; data(:,i - j*deltaT)];
-
-            if useDerivatives
-                thisVector = [thisVector; dataDiffs(:,i - j*deltaT)];
-            end
-        end
-
-        delayEmbeddedData(:,index) = thisVector;
-        index = index + 1;
-    end
+    timeIndOffsets = repelem(useDerivatives + deltaT*(numDelays:-1:0)', nChans);
+    timeInds = timeIndOffsets + (1:size(data, 2)-embeddedTime);
+    chanInds = repmat((1:nChans)', numDelays + 1, size(timeInds, 2));
+    linearInds = sub2ind(size(data), chanInds, timeInds);
+    delayEmbeddedData = data(linearInds);
     
     if flipped
         delayEmbeddedData = delayEmbeddedData';
