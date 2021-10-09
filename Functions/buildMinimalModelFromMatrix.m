@@ -92,9 +92,9 @@ end
 MIN_VALUE = 1/10000;
 DISPLAY = 1;
 
-graphTree = (transitionToMatrix);
+graphTree = transitionToMatrix;
 graphTree(graphTree < MIN_VALUE) = MIN_VALUE;
-graphTree(find(eye(size(graphTree)))) = MIN_VALUE;
+graphTree(eye(size(graphTree))) = MIN_VALUE;
 graphTree = 1 ./ graphTree;
 
 
@@ -245,7 +245,7 @@ for i = 1:size(loopCorrelationMatrix,1)
     overlapLoops = sort(setdiff(overlapLoops, [removedLoops, i]), 'descend');
     [~, longestLoop] = max(loopLengths(overlapLoops));
     
-    if length(longestLoop) > 0
+    if ~isempty(longestLoop)
         mergeLoop = overlapLoops(longestLoop);
         
         mergedLoopIDs(i) = mergeLoop;
