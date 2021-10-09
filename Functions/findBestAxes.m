@@ -21,7 +21,7 @@ function [bestLocalProjections, sigma, bestDiffSigmaValues, gaussianProximity, n
     
     % defaults if we have to exit early
     gaussianProximity = nan(size(origDistances));        
-    bestLocalProjections = nan(1, size(dynamicsStream, 2))';
+    bestLocalProjections = nan(size(dynamicsStream, 2), 1);
     sigma = nan;
     bestDiffSigmaValues = nan;
     neighborCount = nan;
@@ -90,7 +90,7 @@ tic
     gaussianProximity = exp(-totalDists.^2/(2*sigma^2));
 
     % other return values
-    bestLocalProjections = currentSTD;
+    bestLocalProjections = currentSTD(:);
     bestDiffSigmaValues = 0;
     neighborCount = length(scaledNeighborInds);
     outCluster = gaussianProximity < exp(-1); % if we want points out of the cluster to have dist > 2s, shouldn't this be "< exp(-2)"?
