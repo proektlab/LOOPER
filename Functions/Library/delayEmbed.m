@@ -1,9 +1,9 @@
 function [delayEmbeddedData, embeddedTime] = delayEmbed(data, numDelays, deltaT, useDerivatives, dontFlip)
-    if ~exist('useDerivatives') || isempty(useDerivatives)
+    if ~exist('useDerivatives', 'var') || isempty(useDerivatives)
         useDerivatives = 1;
     end
     
-    if ~exist('dontFlip') || isempty(dontFlip)
+    if ~exist('dontFlip', 'var') || isempty(dontFlip)
         dontFlip = 0;
     end
     

@@ -1,3 +1,4 @@
+function buildDiffusionMap
 
 %% get variables
 

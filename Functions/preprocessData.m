@@ -39,9 +39,13 @@ end
 
 dataAmplitude = max(tempData, [], 2) - min(tempData, [], 2);
 dataAmplitudeQuantile = quantile(tempData, 0.95, 2) - quantile(tempData, 0.05, 2);
-dataAmplitudeQuantile(dataAmplitudeQuantile == 0) = dataAmplitude(dataAmplitudeQuantile == 0);
-dataAmplitudeQuantile(dataAmplitudeQuantile == 0) = 1;
 
+% For any channels whose center 90% have 0 spread (unlikely), default to the full range
+dataAmplitudeQuantile(dataAmplitudeQuantile == 0) = dataAmplitude(dataAmplitudeQuantile == 0);
+
+% If a channel is completely constant, default to a range of 1
+% EB: Do we really want to do this, why not just leave it at 0?
+dataAmplitudeQuantile(dataAmplitudeQuantile == 0) = 1;
 
 dataMagnitude = norm(dataAmplitudeQuantile(dataIndices));
 

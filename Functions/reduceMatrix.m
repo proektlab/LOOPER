@@ -38,15 +38,14 @@ MIN_MODE = 0.1;
 MAX_TIMES = 50;
 PHASE_SIGMA = pi/10;
 PHASE_STEPS = 100;
-checkTimes = 1:maxCheckTime;
 
 stepMatrix = diffusedProbabilities;
 
 stateDistributions = [];
-currentMatrix = diffusedProbabilities^checkTimes(1);
+currentMatrix = diffusedProbabilities;
 
-waitHandle = parfor_progressbar(length(checkTimes), 'Calculating true distributions');
-for i = 1:length(checkTimes)
+waitHandle = parfor_progressbar(maxCheckTime, 'Calculating true distributions');
+for i = 1:maxCheckTime
     stateDistributions(:,:,i) = currentMatrix*eye(size(diffusedProbabilities,2));
     
     currentMatrix = stepMatrix*currentMatrix;
@@ -110,10 +109,10 @@ for clusterIndex = 1:length(clusterCounts)
     end
     
     testStateDistributions = [];
-    currentMatrix = reducedMatrix^checkTimes(1);
+    currentMatrix = reducedMatrix;
     stepMatrix = reducedMatrix;
     
-    for i = 1:length(checkTimes)
+    for i = 1:maxCheckTime
         reducedDistribution = currentMatrix*eye(size(reducedMatrix,2));
         
         expandedMatrixTemp = zeros(length(clusterIDs), size(reducedDistribution,2));
@@ -139,7 +138,7 @@ for clusterIndex = 1:length(clusterCounts)
     %% Calculate KLs
     
     
-    for i = 1:length(checkTimes)
+    for i = 1:maxCheckTime
         realDistribution = stateDistributions(:,:,i);
         reducedDistribution = testStateDistributions(:,:,i);
         
