@@ -1,12 +1,12 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2420548056" file="Z:\code\LOOPER\LOOPER.prj" location="Z:\code\LOOPER" name="LOOPER" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2054276072" file="D:\myLOOPER\LOOPER.prj" location="D:\myLOOPER" name="LOOPER" target="target.mlapps" target-name="Package App">
     <param.appname>LOOPER</param.appname>
     <param.authnamewatermark>Connor Brennan</param.authnamewatermark>
     <param.email />
-    <param.company>University of Pennsylvania</param.company>
+    <param.company />
     <param.icon />
     <param.icons />
-    <param.summary>Finds stable manifolds in neural activity.</param.summary>
+    <param.summary />
     <param.description />
     <param.screenshot />
     <param.version>1.0</param.version>
@@ -15,11 +15,13 @@
     <param.products.version />
     <param.platforms />
     <param.output>${PROJECT_ROOT}</param.output>
-    <param.guid>e6fce4ed-0bac-4ced-8585-73f5959277ce</param.guid>
+    <param.guid>7d9cbadc-adb3-4d62-9882-9629d4d2f84c</param.guid>
     <unset>
       <param.email />
+      <param.company />
       <param.icon />
       <param.icons />
+      <param.summary />
       <param.description />
       <param.screenshot />
       <param.version />
@@ -30,76 +32,77 @@
       <param.output />
     </unset>
     <fileset.main>
-      <file>${PROJECT_ROOT}\LOOPER.mlapp</file>
+      <file>${PROJECT_ROOT}\@LOOPER\LOOPER.mlapp</file>
     </fileset.main>
     <fileset.depfun>
-      <file>${PROJECT_ROOT}\Functions\buildDiffusionMap.m</file>
-      <file>${PROJECT_ROOT}\Functions\buildMinimalModelFromLoops.m</file>
-      <file>${PROJECT_ROOT}\Functions\buildMinimalModelFromMatrix.m</file>
-      <file>${PROJECT_ROOT}\Functions\convertToCell.m</file>
-      <file>${PROJECT_ROOT}\Functions\findBestAxes.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\angleDiff.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\delayEmbed.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\filterData.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\normalizeAngle.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\parfor_progressbar.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\Tubeplot\frame.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\Tubeplot\frenet.m</file>
-      <file>${PROJECT_ROOT}\Functions\Library\Tubeplot\tubeplot.m</file>
-      <file>${PROJECT_ROOT}\Functions\mergeData.m</file>
-      <file>${PROJECT_ROOT}\Functions\plotLoops.m</file>
-      <file>${PROJECT_ROOT}\Functions\plotReconstruction.m</file>
-      <file>${PROJECT_ROOT}\Functions\preprocessData.m</file>
-      <file>${PROJECT_ROOT}\Functions\reduceMatrix.m</file>
-      <file>${PROJECT_ROOT}\Functions\validateModel.m</file>
-      <file>${PROJECT_ROOT}\MagGLass.png</file>
+      <file>C:\Users\ethan\Documents\MATLAB\startup.m</file>
+      <file>${PROJECT_ROOT}\+looper\buildDiffusionMap.m</file>
+      <file>${PROJECT_ROOT}\+looper\convertToCell.m</file>
+      <file>${PROJECT_ROOT}\+looper\findBestAxes.m</file>
+      <file>${PROJECT_ROOT}\+looper\flattenData.m</file>
+      <file>${PROJECT_ROOT}\+looper\getDefaultParams.m</file>
+      <file>${PROJECT_ROOT}\+looper\plotPCA.m</file>
+      <file>${PROJECT_ROOT}\+looper\preprocessData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\checkStepValidity.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\getDefaultExperimentName.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\hasData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\initSettings.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\loadPreprocessing.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\newTab.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\plotDiffusionMap.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\plotLoadedData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\plotPCA.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\plotProcessedData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\processMultipleTrials.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\removeData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\removeFigure.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\saveLoadedData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\setupState.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\setupTabs.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\setUpUI.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\showLoadPanel.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\updateLoops.m</file>
     </fileset.depfun>
-    <fileset.resources />
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_ApplyPreprocessing.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_BuildDiffusionMap.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_CancelLoadData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_CancelLoadModel.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_ClearModel.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_ClearValidationData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_ClickData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_FindLoops.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_LoadData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_LoadFile.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_LoadModel.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_LoadModelData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_LoadValidationData.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_PreviewNeighborhood.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_ReduceModel.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_RunAllSteps.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_RunClusteringSteps.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_SaveFile.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_SaveToWorkSpace.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_SearchWorkspace.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_SelectCancel.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_SelectLoops.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_SelectVariable.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_startup.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_StepSelected.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\cb_Validate.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\looperFigure.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\looperTitle.m</file>
+      <file>${PROJECT_ROOT}\@LOOPER\private\looperWarning.m</file>
+      <file>${PROJECT_ROOT}\MagGLass.png</file>
+    </fileset.resources>
     <fileset.package />
     <build-deliverables>
-      <file location="Z:\code" name="LOOPER" optional="false">Z:\code\LOOPER</file>
+      <file location="D:\" name="myLOOPER" optional="false">D:\myLOOPER</file>
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2020a</root>
-      <toolboxes>
-        <toolbox name="matlabcoder" />
-        <toolbox name="embeddedcoder" />
-        <toolbox name="gpucoder" />
-        <toolbox name="fixedpoint" />
-        <toolbox name="matlabhdlcoder" />
-        <toolbox name="neuralnetwork" />
-      </toolboxes>
-      <toolbox>
-        <matlabcoder>
-          <enabled>true</enabled>
-        </matlabcoder>
-      </toolbox>
-      <toolbox>
-        <embeddedcoder>
-          <enabled>true</enabled>
-        </embeddedcoder>
-      </toolbox>
-      <toolbox>
-        <gpucoder>
-          <enabled>true</enabled>
-        </gpucoder>
-      </toolbox>
-      <toolbox>
-        <fixedpoint>
-          <enabled>true</enabled>
-        </fixedpoint>
-      </toolbox>
-      <toolbox>
-        <matlabhdlcoder>
-          <enabled>true</enabled>
-        </matlabhdlcoder>
-      </toolbox>
-      <toolbox>
-        <neuralnetwork>
-          <enabled>true</enabled>
-        </neuralnetwork>
-      </toolbox>
+      <root>C:\Program Files\MATLAB\R2022b</root>
+      <toolboxes />
     </matlab>
     <platform>
       <unix>false</unix>

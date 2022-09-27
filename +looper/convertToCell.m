@@ -1,7 +1,7 @@
 function data = convertToCell(data)
-    if size(data,3) > 1
+    if ~iscell(data)
         data = num2cell(data, [1, 2]);
-    elseif ~iscell(data)
-        data = {data};
     end
+    
+    data = reshape(data, 1, []);
 end

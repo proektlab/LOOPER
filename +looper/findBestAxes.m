@@ -1,5 +1,10 @@
-function [bestLocalProjections, sigma, bestDiffSigmaValues, gaussianProximity, neighborCount, proximityRatio] = findBestAxes(dynamicsStream, trialStream, calcIndex, meanDistanceMatrix, nearestNeighbors, useLocalDimensions, minReturnTime, verbose)
-    
+function [localProjections, sigma, bestDiffSigmaValues, gaussianProximity, neighborCount, proximityRatio] = findBestAxes(looperData, calcIndex, meanDistanceMatrix, verbose)
+    dynamicsStream = looperData.TimeSeries';
+    trialStream = looperData.TrialTimeSeries;
+    nearestNeighbors = looperData.NearestNeighbors;
+    useLocalDimensions = looperData.UseLocalDimensions;
+    minReturnTime = looperData.MinimumReturnTime;
+
     if ~exist('meanDistanceMatrix', 'var') || isempty(meanDistanceMatrix)
         origDistances = pdist2(dynamicsStream(calcIndex, :), dynamicsStream);
     else
@@ -21,7 +26,7 @@ function [bestLocalProjections, sigma, bestDiffSigmaValues, gaussianProximity, n
     
     % defaults if we have to exit early
     gaussianProximity = nan(size(origDistances));        
-    bestLocalProjections = nan(size(dynamicsStream, 2), 1);
+    localProjections = nan(size(dynamicsStream, 2), 1);
     sigma = nan;
     bestDiffSigmaValues = nan;
     neighborCount = nan;
@@ -90,7 +95,7 @@ tic
     gaussianProximity = exp(-totalDists.^2/(2*sigma^2));
 
     % other return values
-    bestLocalProjections = currentSTD(:);
+    localProjections = currentSTD(:);
     bestDiffSigmaValues = 0;
     neighborCount = length(scaledNeighborInds);
     outCluster = gaussianProximity < exp(-1); % if we want points out of the cluster to have dist > 2s, shouldn't this be "< exp(-2)"?

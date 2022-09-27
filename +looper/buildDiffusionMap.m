@@ -1,94 +1,87 @@
-function buildDiffusionMap
+function [sigmaValues] = buildDiffusionMap(looperData)
 
 %% get variables
 
-if ~exist('repopulateDensity', 'var') || isempty(repopulateDensity)
-    repopulateDensity = 0.95;
+if ~isfield(looperData, 'RepopulateDensity') || isempty(looperData.RepopulateDensity)
+    looperData.RepopulateDensity = 0.95;
 end
-if ~exist('minReturnTime', 'var') || isempty(minReturnTime)
-    minReturnTime = 10;
+
+if ~isfield(looperData, 'MinimumReturnTime') || isempty(looperData.MinimumReturnTime)
+    looperData.MinimumReturnTime = 10;
 end
 
     
     %%
 
-    thisDynamicsStream = timeSeriesData';
+    thisDynamicsStream = looperData.TimeSeries';
 
-    if size(thisDynamicsStream,2) >= 3
+    [nPoints, nDims] = size(thisDynamicsStream);
+    
+    if nDims >= 3
         [pcaBasis, ~] = pca(thisDynamicsStream, 'NumComponents', 3);
     else
-        pcaBasis = eye(size(thisDynamicsStream,2));
+        pcaBasis = eye(nDims);
     end
 
     meanDistanceMatrix = pdist2(thisDynamicsStream, thisDynamicsStream);
 
-    bestSigmaValues = [];
-    bestNeighborCounts = [];
-    bestLocalProjections = [];
-    distanceRatios = [];
-    bestDiffSigmaValues = [];
-    localDistances = [];
-
-
-    TRAJECTORY_SIZE = 2;        
     CALC_ALL = 1;        
 
     if ~CALC_ALL
-        calcIndicies = 5;
+        calcIndices = 5;
     else
-        calcIndicies = 1:size(thisDynamicsStream,1);
+        calcIndices = 1:nPoints;
     end
+    nCalc = length(calcIndices);
+    
+    sigmaValues = nan(nCalc, 1);
+    localProjections = nan(nDims, nCalc);
+    localProximities = nan(nCalc, nPoints);
 
-    bestDistances = ones(size(calcIndicies))*1/100;
-    bestNeighborhood = zeros(size(calcIndicies));
-    waitHandle = parfor_progressbar(size(thisDynamicsStream,1), 'Calculating nearest neighbors');        
-    parfor calculateIndex = calcIndicies
-        [bestLocalProjections(:,calculateIndex), bestSigmaValues(calculateIndex), bestDiffSigmaValues(calculateIndex), localDistances(:,calculateIndex), bestNeighborCounts(calculateIndex), distances] = findBestAxes(thisDynamicsStream, trialTimeSeries, calculateIndex, meanDistanceMatrix, nearestNeighbors, useLocalDimensions, minReturnTime);
+    waitHandle = parfor_progressbar(nCalc, 'Calculating nearest neighbors');        
+    parfor i = 1:nCalc
+        [localProjections(:,i), sigmaValues(i), ~, localProximities(i,:)] = ...
+            looper.findBestAxes(looperData, calcIndices(i), meanDistanceMatrix);
 
-        waitHandle.iterate(1);
+        iterate(waitHandle, 1);
     end
     close(waitHandle);
 
-    plotIndices = calcIndicies;
-    bestLocalDistances = localDistances';
-
-    smoothedNeighbors = filterData(bestNeighborCounts, 3);
-        
     %% Use in degree vs out degree to find bad points
 
     figure(2);
     clf;
     h(1) = subplot(2,1,1);
-    imagesc(bestLocalProjections);
+    imagesc(localProjections);
     h(2) = subplot(2,1,2);
     imagesc(thisDynamicsStream');
     linkaxes(h);
     colormap(parula(256));
 
-    test = bestLocalDistances ./ sum(bestLocalDistances,2);
+    % test = localProximities ./ sum(localProximities,2);
     % clf
     % plot(max(test,[],2)' ./ sum(test));
 
-    inCounts = [];
-    outCounts = [];
-    for i = 1:size(bestLocalDistances,1)
-        thisProbabilities = bestLocalDistances(i,:) > exp(-1);
-        outCounts(i) = max(bwlabel(thisProbabilities));
+    inCounts = nan(nCalc, 1);
+    outCounts = nan(nCalc, 1);
+    for i = 1:nCalc
+        outwardConnected = localProximities(i,:) > exp(-1);
+        outCounts(i) = max(bwlabel(outwardConnected));
 
-        thisProbabilities = bestLocalDistances(:,i) > exp(-1);
-        inCounts(i) = max(bwlabel(thisProbabilities));
+        inwardConnected = localProximities(:,i) > exp(-1);
+        inCounts(i) = max(bwlabel(inwardConnected));
     end
 
     allStateValidities = inCounts ./ outCounts;
 
     clf
-    plot(allStateValidities);
+    plot(calcIndices, allStateValidities);
 
 %%
 
     IN_OUT_RATIO_CUTOFF = 0;
 
-    diffusionMapIndicies = 1:size(bestLocalDistances,1);
+    diffusionMapIndicies = 1:size(localProximities,1);
 
     MIN_TRAJECTORY_SIZE = 5;
     TRAJECTORY_SIZE = 2;
@@ -97,10 +90,10 @@ end
     gaussian = gaussian / sum(gaussian);
     kernel = diag(gaussian);
 
-    smoothedLocalDistances = bestLocalDistances;
-    smoothedLocalDistances = min(smoothedLocalDistances, smoothedLocalDistances');
+    smoothedLocalProximities = localProximities;
+    smoothedLocalProximities = min(smoothedLocalProximities, smoothedLocalProximities');
 
-    trimmedMatrix = smoothedLocalDistances;
+    trimmedMatrix = smoothedLocalProximities;
 
     terminalIDs = [];
     currentID = 0;
@@ -124,7 +117,7 @@ end
     exponentiatedMatrix = trimmedMatrix;
     exponentCount = 1;
     lastPopulation = -1;
-    while max(sum(exponentiatedMatrix(goodIndices,:) > 0, 2)) < length(goodIndices) * repopulateDensity && max(sum(exponentiatedMatrix(goodIndices,:) > 0, 2)) ~= lastPopulation
+    while max(sum(exponentiatedMatrix(goodIndices,:) > 0, 2)) < length(goodIndices) * looperData.RepopulateDensity && max(sum(exponentiatedMatrix(goodIndices,:) > 0, 2)) ~= lastPopulation
         exponentCount = exponentCount + 1;
 
         lastPopulation = max(sum(exponentiatedMatrix(goodIndices,:) > 0, 2));
